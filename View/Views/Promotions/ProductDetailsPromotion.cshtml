@@ -1,0 +1,42 @@
+﻿@model IEnumerable<Data.ViewModels.ProductDetailsPromotionViewModel>
+
+@{
+    ViewData["Title"] = "ProductDetailsPromotion";
+}
+x
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Promotion ID</th>
+            <th>Tên sản phẩm</th>
+            <th>Tên danh mục</th>
+            <th>Tên thương hiệu</th>
+            <th>Tên chất liệu</th>
+            <th>Giá sản phẩm</th>
+            <th>Giá khuyến mãi</th>
+            <th>Size</th>
+            <th>Màu sắc</th>
+            <th>Tên đế</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.promotionId</td>
+                <td>@item.ProductName</td>
+                <td>@item.CategoryName</td>
+                <td>@item.BrandName</td>
+                <td>@item.MaterialName</td>
+                <td>@item.PriceProductDetail</td>
+                <td>@item.PricePromotion</td>
+                <td>@item.SizeValue</td>
+                <td>@item.ColorName</td>
+                <td>@item.SoleName</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<a asp-controller="Promotions" asp-action="Index" class="btn btn-primary">Quay lại danh sách khuyến mãi</a>

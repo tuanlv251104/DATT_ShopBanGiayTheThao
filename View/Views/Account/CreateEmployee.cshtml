@@ -1,0 +1,122 @@
+﻿@model Data.ViewModels.CreateAccountModelcs
+
+@{
+    ViewData["Title"] = "CreateEmployee";
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<h1 class="mb-4">Tạo Nhân Viên Mới</h1>
+
+<!-- Container for the employee creation form -->
+<div class="container-fluid">
+    <div class="card shadow-sm rounded">
+        <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center">
+                <h5 class="card-title fw-semibold">Thêm nhân viên</h5>
+                <!-- QR Code scanning button -->
+                <button class="btn btn-outline-primary" id="scanQrButton">
+                    <i class="ti ti-qr-code"></i> Quét QR
+                </button>
+            </div>
+
+            <!-- Form for creating an employee -->
+            <form asp-action="CreateEmployee" enctype="multipart/form-data" class="pt-3">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <div class="row">
+                    <!-- Left side: Profile Picture -->
+                    @* <div class="col-md-4 text-center">
+                        <div class="mb-4">
+                            <label for="profilePicture" class="form-label">Ảnh nhân viên</label>
+                            <div class="profile-img-container mb-3">
+                                <img src="https://via.placeholder.com/150" alt="Avatar" class="rounded-circle" id="profilePreview" width="150">
+                            </div>
+                            <input type="file" class="form-control" id="profilePicture" name="ProfilePicture" onchange="previewImage()">
+                        </div>
+                    </div> *@
+
+                    <!-- Right side: Employee Information -->
+                    <div class="col-md-8">
+                        <div class="row">
+                            <!-- First column of employee information -->
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label asp-for="Name" class="form-label">Họ và tên <span class="text-danger">*</span></label>
+                                    <input asp-for="Name" class="form-control" placeholder="Nhập họ và tên" />
+                                    <span asp-validation-for="Name" class="text-danger"></span>
+                                </div>
+                                <div class="form-group mb-3">
+                                    <label asp-for="Password" class="form-label">Mật khẩu <span class="text-danger">*</span</label>
+                                    <input type="password" asp-for="Password" class="form-control" placeholder="Nhập mật khẩu" />
+                                    <span asp-validation-for="Password" class="text-danger"></span>
+                                </div>
+                                <div class="form-group mb-3">
+                                    <label asp-for="ConfirmPassword" class="form-label">Nhập lại mật khẩu <span class="text-danger">*</span</label>
+                                    <input type="password" asp-for="ConfirmPassword" class="form-control" placeholder="Nhập lại mật khẩu" />
+                                    <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+                                </div>
+                                
+                            </div>
+
+                            <!-- Second column of employee information -->
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label asp-for="PhoneNumber" class="form-label">Số điện thoại <span class="text-danger">*</span></label>
+                                    <input asp-for="PhoneNumber" class="form-control" placeholder="Nhập số điện thoại" />
+                                    <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                                </div>
+                                <div class="form-group mb-3">
+                                    <label asp-for="CIC" class="form-label">Số CCCD <span class="text-danger">*</span></label>
+                                    <input asp-for="CIC" class="form-control" placeholder="Nhập số CCCD" />
+                                    <span asp-validation-for="CIC" class="text-danger"></span>
+                                </div>
+
+                                <div class="form-group mb-3">
+                                    <label asp-for="BirthDay" class="form-label">Ngày sinh <span class="text-danger">*</span></label>
+                                    <input asp-for="BirthDay" type="date" class="form-control" />
+                                    <span asp-validation-for="BirthDay" class="text-danger"></span>
+                                </div>
+
+                                <div class="form-group mb-3">
+                                    <label asp-for="Email" class="form-label">Email <span class="text-danger">*</span></label>
+                                    <input asp-for="Email" type="email" class="form-control" placeholder="Nhập email" />
+                                    <span asp-validation-for="Email" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Submit Button -->
+                <div class="mt-4 text-end">
+                    <button type="submit" class="btn btn-primary">Lưu thông tin</button>
+                    <button type="reset" class="btn btn-secondary"><a asp-action="ListEmployee">Hủy</a></button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        // Preview image function for profile picture
+        function previewImage() {
+            const file = document.getElementById('profilePicture').files[0];
+            const preview = document.getElementById('profilePreview');
+            const reader = new FileReader();
+
+            reader.onloadend = function () {
+                preview.src = reader.result;
+            }
+
+            if (file) {
+                reader.readAsDataURL(file);
+            } else {
+                preview.src = "https://via.placeholder.com/150";
+            }
+        }
+    </script>
+}

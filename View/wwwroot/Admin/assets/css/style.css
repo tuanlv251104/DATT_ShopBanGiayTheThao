@@ -1,0 +1,191 @@
+/* Ban đầu mũi tên hướng xuống */
+.sidebar-link .arrow-icon {
+    transition: transform 0.3s ease; /* Hiệu ứng xoay */
+  }
+  
+  /* Khi aria-expanded là true, mũi tên sẽ xoay ngang */
+  .sidebar-link[aria-expanded="true"] .arrow-icon {
+    transform: rotate(-90deg); /* Xoay -90 độ để hướng ngang */
+  }
+  /* Căn chỉnh mũi tên nằm hẳn ở góc phải */
+.sidebar-link {
+    position: relative;
+    padding-right: 25px; /* Tạo khoảng trống cho mũi tên */
+  }
+  
+  .arrow-icon {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    transition: transform 0.3s ease;
+  }
+  
+  /* Khi aria-expanded = true, mũi tên sẽ xoay ngang */
+  .sidebar-link[aria-expanded="true"] .arrow-icon {
+    transform: translateY(-50%) rotate(-90deg);
+  }
+  
+  .collapse.show {
+    display: block;
+  }
+
+/* Style cho các mục con (dropdown items) */
+.sidebar-item .collapse .sidebar-link {
+    background-color: #f8f9fa;  /* Màu nền khác biệt */
+    padding-left: 35px;         /* Đẩy lùi vào bên trong so với các mục khác */
+    font-size: 14px;            /* Font nhỏ hơn */
+    border-left: 2px solid #007bff;  /* Viền trái để phân biệt */
+    transition: background-color 0.3s ease;
+  }
+  
+  /* Khi hover vào các mục trong dropdown */
+  .sidebar-item .collapse .sidebar-link:hover {
+    background-color: #e2e6ea;  /* Đổi màu nền khi hover */
+    border-left-color: #0056b3; /* Đổi màu viền khi hover */
+  }
+  
+  /* Style cho các mục chính (không nằm trong dropdown) */
+  .sidebar-item > .sidebar-link {
+    font-size: 16px;
+    padding-left: 15px;
+  }
+  
+  /* Đảm bảo mũi tên và các mục chính không bị thay đổi */
+  .arrow-icon {
+    right: 10px;
+  }
+  
+  /* Các mục mở rộng sẽ có dấu hiệu riêng */
+  .collapse.show .sidebar-link {
+    background-color: #e9ecef; /* Màu nền khác khi menu được mở */
+  }
+
+  .card {
+    border-radius: 10px;
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.card-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #333;
+}
+
+/* Search bar */
+.searchbar {
+    position: relative;
+}
+
+.search_input {
+    border-radius: 5px 0 0 5px;
+    border: 1px solid #ced4da;
+}
+
+.search_icon {
+    background-color: #007bff;
+    color: white;
+    border-radius: 0 5px 5px 0;
+    border: 1px solid #007bff;
+    cursor: pointer;
+}
+
+.add_button {
+    padding: 0.375rem 1rem;
+    font-size: 1rem;
+    font-weight: 500;
+    border-radius: 5px;
+    margin-left: 10px;
+}
+
+/* Table styling */
+.table {
+    margin-top: 15px;
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 0.75rem;
+}
+
+.table-striped tbody tr {
+    background-color: #f9f9f9;
+}
+
+.styled-table th, .styled-table td {
+    padding: 12px 15px;
+    text-align: left;
+}
+
+.styled-table thead {
+    background-color: #f1f3f5;
+}
+
+.styled-table th {
+    font-size: 14px;
+    font-weight: 600;
+    color: #495057;
+}
+
+.styled-table tbody tr {
+    border-radius: 10px;
+    transition: all 0.3s ease;
+}
+
+.styled-table tbody tr:hover {
+    background-color: #e9ecef;
+}
+
+/* Vertical align fix */
+.vertical-align {
+    vertical-align: middle;
+}
+
+/* Badge for job status */
+.badge {
+    padding: 0.5em 0.75em;
+    border-radius: 5px;
+    font-size: 0.85rem;
+}
+
+.bg-success {
+    background-color: #28a745;
+    color: white;
+}
+
+.bg-danger {
+    background-color: #dc3545;
+    color: white;
+}
+
+/* Buttons styling */
+.btn-sm {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.8rem;
+    border-radius: 5px;
+}
+
+.btn-info {
+    background-color: #17a2b8;
+    border: none;
+}
+
+.btn-danger {
+    background-color: #dc3545;
+    border: none;
+}
+/* Custom styling for image preview */
+.profile-img-container {
+  position: relative;
+  width: 150px;
+  height: 150px;
+  margin: auto;
+  border: 1px solid #ddd;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.profile-img-container img {
+  object-fit: cover;
+  border-radius: 50%;
+}

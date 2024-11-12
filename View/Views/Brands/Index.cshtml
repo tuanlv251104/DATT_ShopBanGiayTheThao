@@ -1,0 +1,208 @@
+﻿@model View.ViewModel.BrandViewModel
+
+@{
+    ViewData["Title"] = "Brands";
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<div class="container-fluid">
+    <div class="card shadow-sm rounded">
+        <div class="card-body">
+            <h5 class="card-title fw-semibold mb-4">Thương hiệu</h5>
+
+            <!-- Search Bar & Add Button -->
+            <div class="mb-4 d-flex justify-content-between align-items-center">
+                <form method="get" class="input-group searchbar w-50">
+                    <input class="search_input form-control" type="text" name="searchQuery" id="searchInput" placeholder="Tìm thương hiệu">
+                    <button class="btn btn-outline-secondary search_icon" type="submit">
+                        <i class="ti ti-search"></i>
+                    </button>
+                </form>
+                <div>
+                    <button class="btn btn-success add_button" data-bs-toggle="modal" data-bs-target="#addBrandModal">+ Thêm mới</button>
+                </div>
+            </div>
+
+            <!-- Brand Table -->
+            <div class="table-responsive">
+                <table class="table table-striped styled-table">
+                    <thead class="table-light">
+                        <tr>
+                            <th>STT</th>
+                            <th>Tên</th>
+                            <th>Trạng thái</th>
+                            <th>Chức năng</th>
+                        </tr>
+                    </thead>
+                    <tbody id="brandTableBody">
+                        @if (Model.brands != null && Model.brands.Any())
+                        {
+                            foreach (var item in Model.brands)
+                            {
+                                <tr>
+                                    <td></td> <!-- Serial number will be set by JavaScript -->
+                                    <td>@item.Name</td>
+                                    <td>
+                                        <span class="badge @((item.Status ? "bg-success" : "bg-danger"))">
+                                            @(item.Status ? "Active" : "Inactive")
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <form asp-action="ToggleStatus" asp-route-id="@item.Id" method="post" style="display:inline;">
+                                            <button type="submit" class="btn btn-sm btn-custom @(item.Status ? "btn-danger" : "btn-success")">
+                                                <i class="@(item.Status ? "ti ti-pause" : "ti ti-play")"></i>
+                                                @(item.Status ? "Deactivate" : "Activate")
+                                            </button>
+                                        </form>
+                                        <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editBrandModal" data-id="@item.Id" data-name="@item.Name" data-status="@item.Status">Sửa</button>
+                                        <form asp-action="DeleteConfirmed" asp-route-id="@item.Id" method="post" style="display:inline;">
+                                            <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Bạn có chắc chắn muốn xóa mục này không?');">Xóa</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="4" class="text-center">Không tìm thấy kết quả</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Add Brand Modal -->
+            <div class="modal fade" id="addBrandModal" tabindex="-1" aria-labelledby="addBrandModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="addBrandModalLabel">Thêm mới</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form asp-action="Create" method="post">
+                                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                                <div class="mb-3">
+                                    <label asp-for="Brand.Name" class="form-label">Tên thương hiệu <span class="text-danger">*</span></label>
+                                    <input asp-for="Brand.Name" type="text" class="form-control" placeholder="Nhập tên thương hiệu" required>
+                                    <span asp-validation-for="Brand.Name" class="text-danger"></span>
+                                </div>
+                                <div class="form-group form-check">
+                                    <label class="form-check-label">
+                                        <input class="form-check-input" asp-for="Brand.Status" /> @Html.DisplayNameFor(model => model.Brand.Status)
+                                    </label>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                                    <button type="submit" class="btn btn-primary">Lưu</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Edit Brand Modal -->
+            <div class="modal fade" id="editBrandModal" tabindex="-1" aria-labelledby="editBrandModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="editBrandModalLabel">Chỉnh sửa thương hiệu</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form asp-action="Edit" method="post">
+                                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                                <input type="hidden" asp-for="Brand.Id" id="editBrandId" />
+                                <div class="mb-3">
+                                    <label asp-for="Brand.Name" class="form-label">Tên thương hiệu <span class="text-danger">*</span></label>
+                                    <input asp-for="Brand.Name" type="text" class="form-control" id="editBrandName" required>
+                                    <span asp-validation-for="Brand.Name" class="text-danger"></span>
+                                </div>
+                                <div class="form-group form-check">
+                                    <label class="form-check-label">
+                                        <input class="form-check-input" asp-for="Brand.Status" id="editBrandStatus" /> @Html.DisplayNameFor(model => model.Brand.Status)
+                                    </label>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                                    <button type="submit" class="btn btn-primary">Lưu</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pagination -->
+            <nav aria-label="Page navigation">
+                <ul class="pagination justify-content-center mt-3">
+                    <li class="page-item @(ViewBag.CurrentPage == 1 ? "disabled" : "")">
+                        <a class="page-link" href="@Url.Action("Index", new { currentPage = ViewBag.CurrentPage - 1, rowsPerPage = ViewBag.RowsPerPage })" aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+
+                    @for (int i = 1; i <= ViewBag.TotalPages; i++)
+                    {
+                        <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
+                            <a class="page-link" href="@Url.Action("Index", new { currentPage = i, rowsPerPage = ViewBag.RowsPerPage })">@i</a>
+                        </li>
+                    }
+
+                    <li class="page-item @(ViewBag.CurrentPage == ViewBag.TotalPages ? "disabled" : "")">
+                        <a class="page-link" href="@Url.Action("Index", new { currentPage = ViewBag.CurrentPage + 1, rowsPerPage = ViewBag.RowsPerPage })" aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+
+    <style>
+        .btn-custom {
+            width: 120px;
+            text-align: center;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+            .btn-custom:hover {
+                background-color: #f8f9fa;
+                color: #495057;
+            }
+    </style>
+
+    <script>
+        // Edit Modal Data Population
+        var editModal = document.getElementById('editBrandModal');
+        editModal.addEventListener('show.bs.modal', function (event) {
+            var button = event.relatedTarget;
+            var id = button.getAttribute('data-id');
+            var name = button.getAttribute('data-name');
+            var status = button.getAttribute('data-status') === "True";
+
+            document.getElementById('editBrandId').value = id;
+            document.getElementById('editBrandName').value = name;
+            document.getElementById('editBrandStatus').checked = status;
+        });
+
+        // Auto-generate serial numbers based on pagination
+        document.addEventListener("DOMContentLoaded", function () {
+            const rowsPerPage = @ViewBag.RowsPerPage;
+            const currentPage = @ViewBag.CurrentPage;
+
+            const rows = document.querySelectorAll("#brandTableBody tr");
+
+            rows.forEach((row, index) => {
+                const serialNumberCell = row.cells[0];
+                const serialNumber = (currentPage - 1) * rowsPerPage + (index + 1);
+                serialNumberCell.textContent = serialNumber;
+            });
+        });
+    </script>
+}

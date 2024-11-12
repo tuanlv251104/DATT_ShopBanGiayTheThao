@@ -1,0 +1,74 @@
+﻿@model DataProcessing.Models.Address
+
+@{
+    ViewData["Title"] = "Create Address";
+}
+
+<h2>Create Address</h2>
+
+<form asp-action="Create" method="post">
+    <div class="form-group">
+        <label asp-for="RecipientName"></label>
+        <input asp-for="RecipientName" class="form-control" />
+        <span asp-validation-for="RecipientName" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="PhoneNumber"></label>
+        <input asp-for="PhoneNumber" class="form-control" />
+        <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="AddressDetail"></label>
+        <input asp-for="AddressDetail" class="form-control" />
+        <span asp-validation-for="AddressDetail" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label for="Province">Tỉnh</label>
+        @Html.DropDownList("provinceId", new SelectList(ViewBag.Provinces, "Id", "Name", ViewBag.SelectedProvinceId), "-- Chọn Tỉnh --", new { @class = "form-control", @id = "Province" })
+    </div>
+
+    <div class="form-group">
+        <label for="District">Huyện</label>
+        @Html.DropDownList("districtId", ViewBag.Districts != null ? new SelectList(ViewBag.Districts, "Id", "Name", ViewBag.SelectedDistrictId) : new SelectList(Enumerable.Empty<SelectListItem>()), "-- Chọn Huyện --", new { @class = "form-control", @id = "District" })
+    </div>
+
+    <div class="form-group">
+        <label for="Ward">Xã</label>
+        @Html.DropDownList("Commune", ViewBag.Wards != null ? new SelectList(ViewBag.Wards, "Id", "Name") : new SelectList(Enumerable.Empty<SelectListItem>()), "-- Chọn Xã --", new { @class = "form-control", @id = "Ward" })
+    </div>
+
+
+    <div class="form-group">
+        <button type="submit" class="btn btn-primary">Create</button>
+    </div>
+</form>
+<script>
+    document.getElementById('Province').addEventListener('change', function () {
+        var provinceId = this.value;
+        fetch(`/api/Address/GetDistrictsByProvinceId?provinceId=${provinceId}`)
+            .then(response => response.json())
+            .then(data => {
+                var districtSelect = document.getElementById('District');
+                districtSelect.innerHTML = '<option value="">-- Chọn Huyện --</option>';
+                data.forEach(district => {
+                    districtSelect.innerHTML += `<option value="${district.id}">${district.name}</option>`;
+                });
+            });
+    });
+
+    document.getElementById('District').addEventListener('change', function () {
+        var districtId = this.value;
+        fetch(`/api/Address/GetWardsByDistrictId?districtId=${districtId}`)
+            .then(response => response.json())
+            .then(data => {
+                var wardSelect = document.getElementById('Ward');
+                wardSelect.innerHTML = '<option value="">-- Chọn Xã --</option>';
+                data.forEach(ward => {
+                    wardSelect.innerHTML += `<option value="${ward.id}">${ward.name}</option>`;
+                });
+            });
+    });
+</script>

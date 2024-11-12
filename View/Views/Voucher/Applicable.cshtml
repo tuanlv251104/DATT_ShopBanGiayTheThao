@@ -1,0 +1,55 @@
+﻿@model IEnumerable<DataProcessing.Models.Voucher>
+
+@{
+    ViewBag.Title = "Danh Sách Phiếu Giảm Giá Có Thể Áp Dụng";
+}
+
+<h2>Danh Sách Phiếu Giảm Giá Có Thể Áp Dụng</h2>
+
+@if (!Model.Any())
+{
+    <p>Không có phiếu giảm giá nào có thể áp dụng.</p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Mã Voucher</th>
+                <th>Tên Voucher</th>
+                <th>Loại Voucher</th>
+                <th>Giá Trị Giảm Giá</th>
+                <th>Tối đa Giảm Giá</th>
+                <th>Ngày Bắt Đầu</th>
+                <th>Ngày Kết Thúc</th>
+                <th>Điều kiện</th>
+                <th>Số Lượng</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var voucher in Model)
+            {
+                <tr>
+                    <td>@voucher.VoucherCode</td>
+                    <td>@voucher.Name</td>
+                    <td>@voucher.DiscountType</td>
+                    <td>
+                        @if (voucher.DiscountType == "Amount")
+                        {
+                            @string.Format("{0:n0} VND", voucher.DiscountAmount)
+                        }
+                        else
+                        {
+                            @string.Format("{0}%", voucher.DiscountPercent)
+                        }
+                    </td>
+                    <td>@string.Format("{0:n0} VND", voucher.MaxDiscountValue)</td>
+                    <td>@voucher.StartDate.ToShortDateString()</td>
+                    <td>@voucher.EndDate.ToShortDateString()</td>
+                    <td>@string.Format("{0:n0} VND", voucher.Condition)</td>
+                    <td>@voucher.Stock</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

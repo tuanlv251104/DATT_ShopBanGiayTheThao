@@ -1,0 +1,173 @@
+﻿@model IEnumerable<DataProcessing.Models.ApplicationUser>
+
+@{
+    ViewData["Title"] = "ListEmployee";
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<div class="container-fluid">
+    <div class="card shadow-sm rounded">
+        <div class="card-body">
+            <h5 class="card-title fw-semibold mb-4">Nhân viên</h5>
+
+            <!-- Search Bar & Add Button -->
+            <div class="mb-4 d-flex justify-content-between align-items-center">
+                <div class="input-group searchbar w-50">
+                    <input class="search_input form-control" type="text" id="searchInput" placeholder="Nhập tên, sđt hoặc email">
+                    <button class="btn btn-outline-secondary search_icon" type="button" id="searchButton">
+                        <i class="ti ti-search"></i>
+                    </button>
+                </div>
+                <a asp-action="CreateCustomer" class="btn btn-success add_button">+ Thêm mới khách hàng</a>
+            </div>
+
+            <!-- Filter & Export Section -->
+            <div class="mb-4 d-flex justify-content-between align-items-center">
+                <!-- Filters (Giới tính, Chức vụ, Trạng thái) -->
+                <div class="d-flex gap-2">
+                    <div class="form-group">
+                        <select class="form-select" id="filterGender">
+                            <option value="">Giới tính</option>
+                            <option value="Nam">Nam</option>
+                            <option value="Nữ">Nữ</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <select class="form-select" id="filterPosition">
+                            <option value="">Chức vụ</option>
+                            <option value="Kế toán">Kế toán</option>
+                            <option value="Quản lý">Quản lý</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <select class="form-select" id="filterStatus">
+                            <option value="">Trạng thái</option>
+                            <option value="Hoạt động">Hoạt động</option>
+                            <option value="Ngừng hoạt động">Ngừng hoạt động</option>
+                        </select>
+                    </div>
+                </div>
+                <!-- Export Button -->
+                <button class="btn btn-outline-primary" id="exportExcel">Xuất Excel</button>
+            </div>
+
+            <!-- Nhân viên Table -->
+            <div class="table-responsive">
+                <table class="table table-striped styled-table">
+                    <thead class="table-light">
+                        <tr>
+                            <th>STT</th>
+                            <th>Họ và tên</th>
+                            <th>Email</th>
+                            <th>SDT</th>
+                            <th>CIC</th>
+                            <th>Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody id="employeeTable">
+                        @if (Model != null && Model.Any())
+                        {
+                            var index = 1;
+                            foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td>@index</td>
+                                    <td>@item.Name</td>
+                                    <td>@item.Email</td>
+                                    <td>@item.PhoneNumber</td>
+                                    <td>@item.CIC</td>
+                                    <td>
+                                        @Html.ActionLink("Edit", "Edit", new { idAccount = item.Id }) |
+                                        @Html.ActionLink("Details", "Details", new { idAccount = item.Id }) |
+                                        @Html.ActionLink("Delete", "Delete", new { idAccount = item.Id })
+                                    </td>
+                                </tr>
+                                index++;
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="8" class="text-center">Không tìm thấy kết quả</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            <div class="d-flex justify-content-between align-items-center mt-3">
+                <nav aria-label="Pagination">
+                    <ul class="pagination mb-0" id="paginationControls">
+                        <!-- Nút phân trang sẽ được thêm động -->
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    td {
+        text-align: center;
+        vertical-align: middle;
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        let employeeTable = document.getElementById('employeeTable');
+        let paginationControls = document.getElementById('paginationControls');
+        let searchInput = document.getElementById('searchInput');
+        let searchButton = document.getElementById('searchButton');
+        let filterGender = document.getElementById('filterGender');
+        let filterPosition = document.getElementById('filterPosition');
+        let filterStatus = document.getElementById('filterStatus');
+
+        const rowsPerPage = 10;
+        let currentPage = 1;
+        let totalPages = Math.ceil(employeeTable.rows.length / rowsPerPage);
+
+        function renderTable(page) {
+            let start = (page - 1) * rowsPerPage;
+            let end = page * rowsPerPage;
+            let rows = employeeTable.getElementsByTagName('tr');
+
+            for (let i = 0; i < rows.length; i++) {
+                rows[i].style.display = (i >= start && i < end) ? '' : 'none';
+            }
+        }
+
+        function renderPagination() {
+            paginationControls.innerHTML = '';
+            for (let i = 1; i <= totalPages; i++) {
+                let li = document.createElement('li');
+                li.classList.add('page-item', i === currentPage ? 'active' : '');
+                li.innerHTML = `<a class="page-link" href="#">${i}</a>`;
+                li.addEventListener('click', function () {
+                    currentPage = i;
+                    renderTable(currentPage);
+                    renderPagination();
+                });
+                paginationControls.appendChild(li);
+            }
+        }
+
+        searchButton.addEventListener('click', function () {
+            let query = searchInput.value.toLowerCase();
+            let rows = employeeTable.getElementsByTagName('tr');
+            for (let i = 0; i < rows.length; i++) {
+                let cells = rows[i].getElementsByTagName('td');
+                let name = cells[2].innerText.toLowerCase();
+                let email = cells[3].innerText.toLowerCase();
+                let phone = cells[4].innerText.toLowerCase();
+
+                rows[i].style.display = (name.includes(query) || email.includes(query) || phone.includes(query)) ? '' : 'none';
+            }
+        });
+
+        // Render initial table and pagination
+        renderTable(currentPage);
+        renderPagination();
+    });
+</script>

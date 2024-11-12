@@ -1,0 +1,223 @@
+﻿@model DataProcessing.Models.Promotion
+
+@{
+    ViewData["Title"] = "Create";
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<h1>Create Promotion</h1>
+<hr />
+
+<div class="container-fluid p-0">
+    <div class="row">
+        <!-- Form Promotion -->
+        <div class="col-md-5">
+            <div class="card">
+                <div class="card-header">
+                    <h4>Promotion Details</h4>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Create">
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                        <div class="form-group">
+                            <label asp-for="Name" class="control-label"></label>
+                            <input asp-for="Name" class="form-control" required />
+                            <span asp-validation-for="Name" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label asp-for="DiscountValue" class="control-label"></label>
+                            <input asp-for="DiscountValue" class="form-control" type="number" step="0.01" required />
+                            <span asp-validation-for="DiscountValue" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label asp-for="StartDate" class="control-label"></label>
+                            <input asp-for="StartDate" class="form-control" type="datetime-local" required />
+                            <span asp-validation-for="StartDate" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label asp-for="EndDate" class="control-label"></label>
+                            <input asp-for="EndDate" class="form-control" type="datetime-local" required />
+                            <span asp-validation-for="EndDate" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group form-check">
+                            <input class="form-check-input" asp-for="Status" />
+                            <label class="form-check-label" for="Status">@Html.DisplayNameFor(model => model.Status)</label>
+                        </div>
+
+                        <div class="form-group">
+                            <!-- Input ẩn để lưu các ID biến thể được chọn -->
+                            <input type="hidden" id="selectedVariantIds" name="selectedVariantIds" />
+                            <input type="submit" value="Create" class="btn btn-primary" />
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Product Selection -->
+        <div class="col-md-7">
+            <div class="card">
+                <div class="card-header">
+                    <h4>Product Selection</h4>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped styled-table">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>STT</th>
+                                    <th>Product</th>
+                                    <th>
+                                        <input type="checkbox" id="select-all" />
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (ViewBag.ProductList != null)
+                                {
+                                    int stt = 1;
+                                    foreach (var product in ViewBag.ProductList)
+                                    {
+                                        <tr>
+                                            <td>@stt</td>
+                                            <td>@product.Text</td>
+                                            <td>
+                                                <input type="checkbox" name="selectedProductIds" value="@product.Value" class="product-checkbox" />
+                                            </td>
+                                        </tr>
+                                        stt++;
+                                    }
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Product Variants Table -->
+    <div class="card mt-3">
+        <div class="card-header">
+            <h4>Product Variants</h4>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped" id="variant-table">
+                    <thead class="table-light">
+                        <tr>
+                            <th>
+                                <input type="checkbox" id="select-all-variants" />
+                            </th>
+                            <th>STT</th>
+                            <th>Product Name</th>
+                            <th>Category</th>
+                            <th>Brand</th>
+                            <th>Material</th>
+                            <th>Sale</th>
+                            <th>Color</th>
+                            <th>Sole</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Product variants will be dynamically loaded here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('#select-all').on('change', function () {
+                var isChecked = $(this).is(':checked');
+                $('input[name="selectedProductIds"]').prop('checked', isChecked);
+                loadProductVariants();
+            });
+
+            $('input[name="selectedProductIds"]').on('change', function () {
+                loadProductVariants();
+            });
+
+            $('#select-all-variants').on('change', function () {
+                var isChecked = $(this).is(':checked');
+                $('input[name="selectedVariantIds"]').prop('checked', isChecked);
+            });
+
+            $(document).on('change', 'input[name="selectedVariantIds"]', function () {
+                var selectedVariantIds = [];
+                $('input[name="selectedVariantIds"]:checked').each(function () {
+                    selectedVariantIds.push($(this).val());
+                });
+
+                // Gán các ID biến thể vào input ẩn
+                $('#selectedVariantIds').val(selectedVariantIds.join(','));
+            });
+
+
+            function loadProductVariants() {
+                var selectedProductIds = [];
+
+                // Lấy tất cả các checkbox được chọn và thêm giá trị của chúng vào mảng
+                $('input[name="selectedProductIds"]:checked').each(function () {
+                    selectedProductIds.push($(this).val());
+                });
+
+                // Gửi dữ liệu tới server qua AJAX
+                $.ajax({
+                    type: "POST",
+                    url: '@Url.Action("GetProductVariants", "Promotions")', // Đảm bảo URL đúng
+                    contentType: "application/json",
+                    data: JSON.stringify(selectedProductIds),
+                    success: function (data) {
+                        updateVariantTable(data);
+                    },
+                    error: function (xhr, status, error) {
+                        $('#variant-table tbody').empty().append('<tr><td colspan="8">Error loading variants.</td></tr>');
+                    }
+                });
+            }
+
+            function updateVariantTable(variants) {
+                var tableBody = $("#variant-table tbody");
+                tableBody.empty();
+
+                // Kiểm tra nếu có biến thể sản phẩm
+                if (Array.isArray(variants) && variants.length > 0) {
+                    variants.forEach(function (variant, index) {
+                        console.log('Variant:', variant); // Ghi lại toàn bộ đối tượng variant
+                        const SizeValue = variant.sizeValue != null ? variant.sizeValue.toString() : '0';
+                        var row = `<tr>
+                    <td>
+                        <input type="checkbox" name="selectedVariantIds" value="${variant.id}" />
+                    </td>
+                    <td>${index + 1}</td>
+                    <td>${variant.productName}</td>
+                    <td>${variant.categoryName}</td>
+                    <td>${variant.brandName}</td>
+                    <td>${variant.materialName}</td>
+                    <td>${SizeValue}</td>
+                    <td>${variant.colorName}</td>
+                    <td>${variant.soleName}</td>
+                    </tr>`;
+                        tableBody.append(row);
+                    });
+                } else {
+                    tableBody.append('<tr><td colspan="8">No variants found for the selected products.</td></tr>');
+                }
+
+
+            }
+        });
+
+    </script>
+}
+    

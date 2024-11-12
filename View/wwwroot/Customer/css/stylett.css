@@ -1,0 +1,104 @@
+.product-card {
+    border-radius: 15px;
+    overflow: hidden;
+    transition: box-shadow 0.3s ease;
+}
+
+.product-card:hover {
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+}
+
+.product-image {
+    position: relative;
+}
+
+.product-image img {
+    border-top-left-radius: 15px;
+    border-top-right-radius: 15px;
+}
+
+/* Hiệu ứng phóng to khi hover vào hình ảnh */
+.product-image:hover img {
+    transform: scale(1.05);
+}
+
+/* Vòng tròn màu sắc và kích thước cho tùy chọn */
+.color-circle {
+    width: 30px;
+    height: 30px;
+    border: 1px solid #ddd;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+}
+
+.size-circle {
+    width: 30px; /* Đặt chiều rộng */
+    height: 30px; /* Đặt chiều cao */
+    border-radius: 5px; /* Tạo góc xẹp */
+    border: 1px solid #007bff; /* Màu viền */
+    font-weight: bold;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+}
+
+.size-circle:hover, .color-circle:hover {
+    transform: scale(1.1);
+}
+
+.color-circle.selected {
+    border: 4px solid #ddd; /* Đổi màu viền khi chọn */
+}
+
+.size-circle.selected {
+    background-color: #007bff;
+    color: yellow; 
+}
+.size-circle:nth-child(n+6) {
+    display: none;
+}
+.color-circle:nth-child(n+4) {
+    display: none;
+}
+
+.discount-badge {
+    font-size: 0.85rem;
+    font-weight: bold;
+}
+
+.action-icons a {
+    font-size: 1.5rem;
+    transition: color 0.3s ease;
+}
+
+.action-icons a:hover {
+    color: #0056b3; /* Màu khi hover */
+}
+
+.pagination {
+    display: flex; /* Đảm bảo sử dụng flexbox để sắp xếp nằm ngang */
+    list-style-type: none; /* Loại bỏ dấu chấm */
+    padding: 0; /* Loại bỏ khoảng cách bên trong */
+    margin: 0; /* Loại bỏ khoảng cách bên ngoài */
+}
+
+.pagination .page-item {
+    margin: 0 5px; 
+}
+.original-price {
+    text-decoration: line-through;
+    color: #28a745;
+    font-size: 1.2rem;
+    line-height: 1.5;
+}
+
+.sale-price {
+    color: #28a745; /* Green color for sale price */
+    font-weight: bold;
+    margin-top: 5px;
+}

@@ -1,0 +1,217 @@
+﻿@model View.ViewModel.SolesViewModel
+
+@{
+    ViewData["Title"] = "Soles";
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<div class="container-fluid">
+    <div class="card shadow-sm rounded">
+        <div class="card-body">
+            <h5 class="card-title fw-semibold mb-4">Đế giày</h5>
+
+            <!-- Search Bar & Add Button -->
+            <div class="mb-4 d-flex justify-content-between align-items-center">
+                <form method="get" class="input-group searchbar w-50">
+                    <input class="search_input form-control" type="text" name="searchQuery" id="searchInput" placeholder="Tìm đế giày">
+                    <button class="btn btn-outline-secondary search_icon" type="submit">
+                        <i class="ti ti-search"></i>
+                    </button>
+                </form>
+
+                <div class="mb-4">
+                    <button class="btn btn-success add_button" data-bs-toggle="modal" data-bs-target="#addSoleModal">+ Thêm mới</button>
+                </div>
+            </div>
+
+            <!-- Table Danh sách chất liệu -->
+            <div class="table-responsive">
+                <table class="table table-striped styled-table">
+                    <thead class="table-light">
+                        <tr>
+                            <th>STT</th>
+                            <th>Tên</th>
+                            <th>Trạng thái</th>
+                            <th>Chức năng</th>
+                        </tr>
+                    </thead>
+                    <tbody id="materialsTableBody">
+                        @if (Model.soles != null && Model.soles.Any())
+                        {
+                            // Không cần tính toán số thứ tự ở đây nữa
+                            foreach (var item in Model.soles)
+                            {
+                                <tr>
+                                    <td></td> <!-- STT sẽ được tính bằng JavaScript -->
+                                    <td>@item.TypeName</td>
+                                    <td>
+                                        <span class="badge @((item.Status ? "bg-success" : "bg-danger"))">
+                                            @(item.Status ? "Active" : "Inactive")
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <form asp-action="ToggleStatus" asp-route-id="@item.Id" method="post" style="display:inline;">
+                                            <button type="submit" class="btn btn-sm btn-custom @(item.Status ? "btn-danger" : "btn-success")">
+                                                <i class="@(item.Status ? "ti ti-pause" : "ti ti-play")"></i>
+                                                @(item.Status ? "Deactivate" : "Activate")
+                                            </button>
+                                        </form>
+                                        <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editSoleModal" data-id="@item.Id" data-name="@item.TypeName" data-status="@item.Status">Sửa</button>
+                                        <form asp-action="DeleteConfirmed" asp-route-id="@item.Id" method="post" style="display:inline;">
+                                            <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Bạn có chắc chắn muốn xóa mục này không?');">
+                                                Xóa
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="4" class="text-center">Không tìm thấy kết quả</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Modal Thêm mới loại giày -->
+            <div class="modal fade" id="addSoleModal" tabindex="-1" aria-labelledby="addSoleModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="addSoleModalLabel">Thêm mới đế giày</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form asp-action="Create" method="post">
+                                <input type="hidden" asp-for="soles" />
+                                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                                <div class="mb-3">
+                                    <label asp-for="sole.TypeName" class="form-label">Tên đế giày <span class="text-danger">*</span></label>
+                                    <input asp-for="sole.TypeName" type="text" class="form-control" placeholder="Nhập tên đế giày" required>
+                                    <span asp-validation-for="sole.TypeName" class="text-danger"></span>
+                                </div>
+                                <div class="form-group form-check">
+                                    <label class="form-check-label">
+                                        <input class="form-check-input" asp-for="sole.Status" /> @Html.DisplayNameFor(model => model.sole.Status)
+                                    </label>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                                    <button type="submit" class="btn btn-primary">Lưu</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal Chỉnh sửa loại giày -->
+            <div class="modal fade" id="editSoleModal" tabindex="-1" aria-labelledby="editSoleModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="editSoleModalLabel">Chỉnh sửa loại giày</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form asp-action="Edit" method="post">
+                                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                                <input type="hidden" asp-for="soles" />
+                                <input type="hidden" asp-for="sole.Id" id="editMaterialId" />
+                                <div class="mb-3">
+                                    <label asp-for="sole.TypeName" class="form-label">Tên đế giày <span class="text-danger">*</span></label>
+                                    <input asp-for="sole.TypeName" type="text" class="form-control" placeholder="Nhập tên đế giày" id="editMaterialName" required>
+                                    <span asp-validation-for="sole.TypeName" class="text-danger"></span>
+                                </div>
+                                <div class="form-group form-check">
+                                    <label class="form-check-label">
+                                        <input class="form-check-input" asp-for="sole.Status" id="editMaterialStatus" /> @Html.DisplayNameFor(model => model.sole.Status)
+                                    </label>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                                    <button type="submit" class="btn btn-primary">Lưu</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pagination -->
+            <nav aria-label="Page navigation">
+                <ul class="pagination justify-content-center mt-3">
+                    <li class="page-item @(ViewBag.CurrentPage == 1 ? "disabled" : "")">
+                        <a class="page-link" href="@Url.Action("Index", new { currentPage = ViewBag.CurrentPage - 1, rowsPerPage = ViewBag.RowsPerPage })" aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+
+                    @for (int i = 1; i <= ViewBag.TotalPages; i++)
+                    {
+                        <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
+                            <a class="page-link" href="@Url.Action("Index", new { currentPage = i, rowsPerPage = ViewBag.RowsPerPage })">@i</a>
+                        </li>
+                    }
+
+                    <li class="page-item @(ViewBag.CurrentPage == ViewBag.TotalPages ? "disabled" : "")">
+                        <a class="page-link" href="@Url.Action("Index", new { currentPage = ViewBag.CurrentPage + 1, rowsPerPage = ViewBag.RowsPerPage })" aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <style>
+        .btn-custom {
+            width: 120px; /* Chiều rộng cố định */
+            text-align: center; /* Căn giữa văn bản */
+            transition: background-color 0.3s, color 0.3s; /* Hiệu ứng chuyển màu */
+        }
+
+            .btn-custom:hover {
+                background-color: #f8f9fa; /* Màu nền khi hover */
+                color: #495057; /* Màu chữ khi hover */
+            }
+    </style>
+    <script>
+        // JavaScript để xử lý sự kiện khi mở modal chỉnh sửa
+        var editModal = document.getElementById('editSoleModal');
+        editModal.addEventListener('show.bs.modal', function (event) {
+            var button = event.relatedTarget;
+            var id = button.getAttribute('data-id');
+            var name = button.getAttribute('data-name');
+            var status = button.getAttribute('data-status');
+
+            var editMaterialId = editModal.querySelector('#editMaterialId');
+            var editMaterialName = editModal.querySelector('#editMaterialName');
+            var editMaterialStatus = editModal.querySelector('#editMaterialStatus');
+
+            editMaterialId.value = id;
+            editMaterialName.value = name;
+            editMaterialStatus.checked = (status === "True");
+        });
+        document.addEventListener("DOMContentLoaded", function () {
+            const rowsPerPage = @ViewBag.RowsPerPage;
+            const currentPage = @ViewBag.CurrentPage;
+
+            const rows = document.querySelectorAll("#materialsTableBody tr");
+
+            rows.forEach((row, index) => {
+                const serialNumberCell = row.cells[0];
+                const serialNumber = (currentPage - 1) * rowsPerPage + (index + 1);
+                serialNumberCell.textContent = serialNumber;
+            });
+        });
+    </script>
+}

@@ -1,0 +1,527 @@
+﻿@model IEnumerable<DataProcessing.Models.ProductDetail>
+@{
+    ViewData["Title"] = "Quản lý đơn hàng";
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<div>
+    <h1 class="mb-4 text-center">Quản lý đơn hàng</h1>
+
+    <!-- Button to add a new invoice -->
+    <div class="d-flex justify-content-end mb-3">
+        <button class="btn btn-success" id="addInvoiceBtn">
+            <i class="ti ti-plus"></i> Tạo hóa đơn mới
+        </button>
+    </div>
+
+    <!-- Tab list -->
+    <ul class="nav nav-tabs mb-3 border-0" id="invoiceTabs" role="tablist">
+        <!-- Các tab sẽ được thêm động ở đây -->
+    </ul>
+
+    <!-- Tab content -->
+    <div class="tab-content p-3 border rounded bg-light" id="invoiceTabsContent">
+        <!-- Nội dung các hóa đơn sẽ được thêm động ở đây -->
+    </div>
+
+    <!-- Modal danh sách sản phẩm -->
+    <div class="modal fade" id="productModal" tabindex="-1" aria-labelledby="productModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="productModalLabel">Tìm kiếm sản phẩm</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body mt-3">
+                    <!-- Search and Filter -->
+                    <div class="row">
+                        <div class="col-md-6">
+                            <input type="text" class="form-control" placeholder="Tìm kiếm sản phẩm">
+                        </div>
+                        <div class="pt-3">
+                            <div class="row">
+                                <div class="col-md-2">
+                                    <select class="form-select">
+                                        <option selected>Danh mục</option>
+                                        <option>Giày thể thao</option>
+                                        <option>Giày da</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-2">
+                                    <select class="form-select">
+                                        <option selected>Màu sắc</option>
+                                        <option>Đen</option>
+                                        <option>Trắng</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-2">
+                                    <select class="form-select">
+                                        <option selected>Chất liệu</option>
+                                        <option>Da</option>
+                                        <option>Vải</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-2">
+                                    <select class="form-select">
+                                        <option selected>Kích cỡ</option>
+                                        <option>39</option>
+                                        <option>40</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-2">
+                                    <select class="form-select">
+                                        <option selected>Đế giày</option>
+                                        <option>Phẳng</option>
+                                        <option>Cao</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-2">
+                                    <select class="form-select">
+                                        <option selected>Thương hiệu</option>
+                                        <option>Nike</option>
+                                        <option>Adidas</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Product list -->
+                    <table class="table table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Ảnh sản phẩm</th>
+                                <th>Tên giày</th>
+                                <th>Đế giày</th>
+                                <th>Loại giày</th>
+                                <th>Thương hiệu</th>
+                                <th>Màu sắc</th>
+                                <th>Chất liệu</th>
+                                <th>Size</th>
+                                <th>Giá</th>
+                                <th>Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach(var item in Model)
+                            {
+                                <tr>
+                                    <td style="vertical-align: middle;">
+                                        <div class="product-image position-relative">
+                                            <img src="https://product.hstatic.net/1000312752/product/agct043-2-4_9a47c579c5ca4826ae83ecae15973290.jpg" alt="product" class="rounded" style="width: 80px; height: 80px; object-fit: cover;">
+                                            <div style="position: absolute; top: 5px; right: 5px; background-color: red; color: white; padding: 3px 5px; border-radius: 5px; font-size: 0.75rem;">
+                                                10% off
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td style="vertical-align: middle;">@item.Product.Name</td>
+                                    <td style="vertical-align: middle;">@item.Product.Sole?.TypeName</td>
+                                    <td style="vertical-align: middle;">@item.Product.Category?.Name</td>
+                                    <td style="vertical-align: middle;">@item.Product.Brand?.Name</td>
+                                    <td style="vertical-align: middle;">@item.Color?.Name</td>
+                                    <td style="vertical-align: middle;">@item.Product.Material?.Name</td>
+                                    <td style="vertical-align: middle;">@item.Size?.Value</td>
+                                    <td style="vertical-align: middle;">
+                                        <span class="text-decoration-line-through">@item.Price</span>
+                                        <p class="text-danger" style="font-weight: bold;">900,000đ</p>
+                                    </td>
+                                    <td style="vertical-align: middle;">
+                                        <button class="btn btn-primary"
+                                                onclick="openDetailModal('@item.Product.Name', '@item.Product.Sole?.TypeName', '@item.Product.Brand?.Name', '@item.Price', '@item.Size?.Value', @item.Weight)">
+                                            Chọn
+                                        </button>
+                                    </td>
+                                </tr>
+                            }
+                            
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal sản phẩm -->
+    <div class="modal fade" id="productDetailModal" tabindex="-1" aria-labelledby="productDetailModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="productDetailModalLabel">Tên giày + Đế giày + Màu</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p><strong>Loại giày:</strong> <span id="shoeType"></span></p>
+                    <p><strong>Thương hiệu:</strong> <span id="brand"></span></p>
+                    <p><strong>Giá:</strong> <span id="price"></span></p>
+                    <p><strong>Size:</strong> <span id="size"></span></p>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong>Số lượng tồn kho:</strong> <span id="stockQuantity"></span></p>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="quantity-control input-group">
+                                <button class="btn btn-secondary" type="button" onclick="decreaseQuantity(this)">-</button>
+                                <input type="number" class="form-control" value="1" id="quantityInput" style="width: 60px; text-align: center;">
+                                <button class="btn btn-secondary" type="button" onclick="increaseQuantity(this)">+</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+@section Styles {
+    <style>
+        /* Các style đã có */
+        .nav-tabs .nav-link {
+            color: #495057;
+            background-color: #e9ecef;
+            border-color: #dee2e6;
+            transition: background-color 0.2s ease;
+            border-radius: 5px 5px 0 0;
+            margin-right: 5px;
+        }
+
+            .nav-tabs .nav-link.active {
+                color: #fff;
+                background-color: #28a745;
+                border-color: #28a745;
+            }
+
+        .nav-tabs .btn-close {
+            font-size: 0.8rem;
+            margin-left: 8px;
+        }
+
+        .tab-content {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+        }
+
+        .product-item {
+            background-color: #ffffff;
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0 1px 5px rgba(0, 0, 0, 0.1);
+            margin-bottom: 15px;
+            transition: transform 0.2s;
+        }
+
+            .product-item:hover {
+                transform: scale(1.02);
+            }
+
+            .product-item img {
+                width: 80px;
+                height: auto;
+            }
+
+            .product-item .product-info {
+                display: flex;
+                align-items: center;
+            }
+
+                .product-item .product-info div {
+                    line-height: 1.2;
+                }
+
+        .form-group input[type="text"],
+        .form-group input[type="number"],
+        .form-group input[type="email"] {
+            border-radius: 5px;
+            border: 1px solid #ced4da;
+        }
+
+        .btn-danger {
+            background-color: #dc3545;
+        }
+
+        .btn-primary {
+            background-color: #007bff;
+            border-color: #007bff;
+        }
+
+        .modal-content {
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+        }
+
+        /* Custom styles for modal */
+        .modal-header {
+            border-bottom: 2px solid #28a745;
+        }
+
+        .modal-title {
+            color: #28a745;
+        }
+
+        .modal-backdrop {
+            opacity: 0.5; /* Điều chỉnh độ mờ của backdrop */
+            background-color: rgba(0, 0, 0, 0.5); /* Màu sắc của backdrop */
+        }
+    </style>
+}
+
+
+@section Scripts {
+    <script>
+        let invoiceCount = 0;
+        const maxInvoices = 5;
+
+        // Function to add a new invoice tab
+        function addNewInvoiceTab() {
+            if (invoiceCount < maxInvoices) {
+                invoiceCount++;
+
+                const newTabId = `invoice-${invoiceCount}`;
+                const tabTitle = `Hóa đơn ${invoiceCount}`;
+
+                // Add new tab
+                const newTab = `
+            <li class="nav-item" role="presentation">
+                <div class="d-flex align-items-center nav-link">
+                    <button class="btn ${invoiceCount === 1 ? 'active' : ''}" id="tab-${newTabId}" data-bs-toggle="tab" data-bs-target="#${newTabId}" type="button" role="tab">
+                        ${tabTitle}
+                    </button>
+                    <button class="btn text-danger" onclick="removeInvoiceTab('${newTabId}')" style="padding: 0; margin-left: 10px;" title="Xóa hóa đơn">
+                        <strong>X</strong>
+                    </button>
+                </div>
+            </li>`;
+                $('#invoiceTabs').append(newTab);
+
+
+                // Add new tab content
+                const newTabContent = `
+                                            <div class="tab-pane fade ${invoiceCount === 1 ? 'show active' : ''}" id="${newTabId}" role="tabpanel">
+                                                <h4 class="mb-3">${tabTitle}</h4>
+
+                                                <!-- Nội dung của hóa đơn -->
+                                                <div class="mb-3" style="background-color: #e9ecef; padding: 15px; border-radius: 5px;">
+                                                    <div class="d-flex justify-content-between align-items-center">
+                                                        <h5 class="mb-0">Sản phẩm</h5>
+                                                        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#productModal">Thêm sản phẩm</button>
+                                                    </div>
+                                                    <hr> <!-- Đường ngang phân cách -->
+
+                                                    <div class="product-list mt-2">
+                                                        <!-- Hàng sản phẩm mẫu -->
+                                                        <div class="product-item d-flex justify-content-between align-items-center border-bottom pb-2 mb-2" style="padding: 10px; background-color: #fff; border-radius: 5px; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);">
+                                                            <div class="product-image position-relative" style="margin-right: 10px;">
+                                                                <img src="https://via.placeholder.com/80" alt="product" class="rounded" style="border-radius: 5px; border: 1px solid #ddd; width: 100px; height: 100px; object-fit: cover;">
+                                                                <div style="position: absolute; top: 5px; right: 5px; background-color: red; color: white; padding: 3px 5px; border-radius: 15px; font-size: 0.75rem;">
+                                                                    10% off
+                                                                </div>
+                                                            </div>
+                                                            <div class="product-details flex-grow-1 mx-2" style="flex: 1;">
+                                                                <strong style="font-size: 1.1rem;">Tên sản phẩm A</strong><br>
+                                                                <span class="text-decoration-line-through" style="color: #999;">1,000,000đ</span><br>
+                                                                <span class="text-danger" style="font-weight: bold; font-size: 0.9rem;">900,000đ</span><br>
+                                                                <span style="font-size: 0.9rem; color: #555;">Size: 42</span>
+                                                            </div>
+                                                            <div class="quantity-control input-group mx-5" style="width: 100px; display: flex;">
+                                                                <button class="btn" type="button" onclick="decreaseQuantity(this)" style="padding: 0.2rem 0.3rem; font-size: 0.8rem; border: 1px solid #ced4da; border-radius: 5px 0 0 5px; background-color: #fff;">-</button>
+                                                                <input type="text" value="1" style="text-align: center; font-size: 0.9rem; height: 30px; width: 30px; border: 1px solid #ced4da; border-radius: 0; outline: none;">
+                                                                <button class="btn" type="button" onclick="increaseQuantity(this)" style="padding: 0.2rem 0.3rem; font-size: 0.8rem; border: 1px solid #ced4da; border-radius: 0 5px 5px 0; background-color: #fff;">+</button>
+                                                            </div>
+                                                            <div class="total-price mx-5 text-danger" style="font-weight: bold; font-size: 0.9rem; margin-right: 10px;">900,000đ</div>
+                                                            <div>
+                                                                <button class="btn btn-danger ms-3 mx-4 text-danger" style="padding: 0.3rem 0.6rem; font-size: 0.8rem;" onclick="removeProduct(this)">Xóa</button>
+                                                            </div>
+                                                        </div>
+                                                        <!-- Thêm các sản phẩm khác tại đây -->
+                                                    </div>
+
+                                                    <!-- Tổng tiền -->
+                                                    <div class="mt-2">
+                                                        <h5 class="text-end">Tổng tiền sản phẩm: <span class="text-danger" id="totalPrice-1">900,000đ</span></h5>
+                                                    </div>
+                                                </div>
+
+                                                <!-- Khe xám ngăn cách -->
+                                                <div style="background-color: #d3d3d3; height: 1px;"></div>
+
+                                                <!-- Thông tin khách hàng và hình thức thanh toán -->
+                                                <div class="row mt-3" style="background-color: #f8f9fa; padding: 15px; border-radius: 5px;">
+                                                    <div class="col-md-6">
+                                                        <h5>Thông tin khách hàng</h5>
+                                                        <div id="customerInfo" style="display: none;">
+                                                            <div class="form-group">
+                                                                <label for="customerName">Tên khách hàng</label>
+                                                                <input type="text" class="form-control" id="customerName" style="border-radius: 5px; border: 1px solid #ced4da;">
+                                                            </div>
+                                                            <div class="form-group mt-2">
+                                                                <label for="customerPhone">Số điện thoại</label>
+                                                                <input type="text" class="form-control" id="customerPhone" style="border-radius: 5px; border: 1px solid #ced4da;">
+                                                            </div>
+                                                            <div class="form-group mt-2">
+                                                                <label for="customerAddress">Địa chỉ</label>
+                                                                <input type="text" class="form-control" id="customerAddress" style="border-radius: 5px; border: 1px solid #ced4da;">
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6 row" id="orderInfo">
+                                                        <h5>Thông tin đơn hàng</h5>
+                                                        <div class="form-group mt-3">
+                                                            <label for="paymentMethod">Hình thức thanh toán</label>
+                                                            <select class="form-control" id="paymentMethod" onchange="toggleAddressField(this)">
+                                                                <option value="store">Mua tại quầy</option>
+                                                                <option value="delivery">Giao hàng</option>
+                                                            </select>
+                                                        </div>
+                                                        <br />
+                                                        <div class="form-group mt-2 col-md-6">
+                                                            <label for="discountCode">Phiếu giảm giá</label>
+                                                            <input type="text" class="form-control" id="discountCode" oninput="applyDiscount(this)" style="border-radius: 5px; border: 1px solid #ced4da;">
+                                                        </div>
+                                                        <div class="form-group mt-2 col-md-6">
+                                                            <label for="discountPercent">Phần trăm giảm giá</label>
+                                                            <input type="number" class="form-control" id="discountPercent" readonly>
+                                                        </div>
+                                                        <br />
+                                                        <div style="margin-top: 20px;">
+                                                            <h5 style="display: flex; justify-content: space-between;">
+                                                                <span>Tiền hàng:</span> 
+                                                                <span id="subtotal-1" class="text-end">900,000đ</span>
+                                                            </h5>
+                                                            <br />
+                                                            <h5 style="display: flex; justify-content: space-between;">
+                                                                <span>Phí vận chuyển:</span> 
+                                                                <span id="shippingFee-1">0đ</span>
+                                                            </h5>
+                                                            <br />
+                                                            <h5 style="display: flex; justify-content: space-between;">
+                                                                <span>Tổng tiền:</span> 
+                                                                <span id="finalTotal-1">900,000đ</span>
+                                                            </h5>
+                                                            <br />
+                                                            <div class="form-group mt-2">
+                                                                <label for="customerPaid">Khách thanh toán</label>
+                                                                <input type="number" class="form-control" id="customerPaid" oninput="calculateBalance(this)" style="border-radius: 5px; border: 1px solid #ced4da;">
+                                                            </div>
+                                                            <br />
+                                                            <h5 style="display: flex; justify-content: space-between;">
+                                                                <span>Tiền thiếu:</span> 
+                                                                <span id="balanceDue">0đ</span>
+                                                            </h5>
+                                                            </div>
+                                                        <button class="btn btn-success mt-3" onclick="confirmOrder()">Xác nhận đặt hàng</button>
+                                                    </div>
+                                                </div>
+                                            </div>`;
+                $('#invoiceTabsContent').append(newTabContent);
+
+                // Activate the new tab
+                $(`#tab-${newTabId}`).tab('show');
+            } else {
+                alert('Bạn chỉ có thể tạo tối đa 5 hóa đơn.');
+            }
+        }
+
+        // Function to remove an invoice tab
+        function removeInvoiceTab(tabId) {
+            // Xóa tab
+            $(`#tab-${tabId}`).parent().remove();
+            // Xóa nội dung tab
+            $(`#${tabId}`).remove();
+
+            // Cập nhật invoiceCount
+            invoiceCount--;
+
+            // Nếu có tab nào còn lại, kích hoạt tab đầu tiên
+            if (invoiceCount > 0) {
+                $('#invoiceTabs .nav-item:first-child .nav-link').tab('show');
+            }
+        }
+
+        // Increase quantity function
+        function increaseQuantity(button) {
+            const input = button.previousElementSibling;
+            input.value = parseInt(input.value) + 1;
+            // Update total price here if needed
+        }
+
+        // Decrease quantity function
+        function decreaseQuantity(button) {
+            const input = button.nextElementSibling;
+            if (parseInt(input.value) > 1) {
+                input.value = parseInt(input.value) - 1;
+            }
+            // Update total price here if needed
+        }
+
+        // Remove product function
+        function removeProduct(button) {
+            const row = button.closest('.product-item');
+            row.remove();
+            // Update total price here if needed
+        }
+
+        // Event listener to add a new invoice
+        $('#addInvoiceBtn').on('click', addNewInvoiceTab);
+
+        // Function to toggle address field visibility
+        function toggleAddressField(select) {
+            const customerInfo = document.getElementById('customerInfo');
+            // Hiển thị thông tin khách hàng khi chọn "Giao hàng"
+            if (select.value === 'delivery') {
+                customerInfo.style.display = 'block';
+            } else {
+                customerInfo.style.display = 'none';
+            }
+        }
+
+        // Function to show product details in the modal
+        function openDetailModal(productName, soleType, brand, price, size, stockQuantity) {
+            // Cập nhật thông tin vào modal chi tiết sản phẩm
+            document.getElementById('productDetailModalLabel').textContent = `${productName} + ${soleType}`;
+            document.getElementById('shoeType').textContent = soleType;
+            document.getElementById('brand').textContent = brand;
+            document.getElementById('price').textContent = price;
+            document.getElementById('size').textContent = size;
+            document.getElementById('stockQuantity').textContent = stockQuantity;
+
+            // Mở modal chi tiết sản phẩm
+            const productDetailModal = new bootstrap.Modal(document.getElementById('productDetailModal'));
+            productDetailModal.show();
+        }
+
+        // Add event listener to the "Chọn" button
+        document.querySelectorAll('.btn-primary').forEach(button => {
+            button.addEventListener('click', function () {
+                const shoeName = "Tên giày A";
+                const soleType = "Phẳng";
+                const color = "Đen";
+                const shoeType = "Thể thao";
+                const brand = "Nike";
+                const price = "900,000đ";
+                const size = "42";
+                const stockQuantity = 10;
+
+                showProductDetails(shoeName, soleType, color, shoeType, brand, price, size, stockQuantity);
+            });
+        });
+    </script>
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

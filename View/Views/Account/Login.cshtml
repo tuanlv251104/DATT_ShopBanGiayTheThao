@@ -1,0 +1,201 @@
+﻿@model Data.ViewModels.SignInModel
+@{
+    Layout = null;
+}
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-danger">
+        @TempData["Success"]
+    </div>
+}
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: 'Poppins', sans-serif;
+    }
+
+    body {
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background: linear-gradient(135deg, #00C9FF, #92FE9D, #FF5733, #E91E63);
+        margin: 0;
+    }
+
+    .login {
+        width: 100%;
+        max-width: 600px; 
+        background-color: #fff;
+        padding: 40px;
+        border-radius: 10px;
+        box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+        text-align: center; 
+    }
+
+    .login-box h2 {
+        text-align: center;
+        margin-bottom: 20px;
+        font-size: 24px;
+        color: #333;
+    }
+
+    .input-box {
+        position: relative;
+        margin-bottom: 30px;
+    }
+
+        .input-box input {
+            width: 100%;
+            padding: 10px 0;
+            font-size: 16px;
+            color: #333;
+            margin-bottom: 30px;
+            border: none;
+            border-bottom: 2px solid #333;
+            outline: none;
+            background: transparent;
+        }
+
+        .input-box label {
+            position: absolute;
+            top: 10px;
+            left: 0;
+            color: #666;
+            pointer-events: none;
+            transition: 0.5s;
+        }
+
+        .input-box input:focus ~ label,
+        .input-box input:valid ~ label {
+            top: -20px;
+            color: #ff416c;
+            font-size: 12px;
+        }
+
+    .forgot-password {
+        text-align: right;
+        margin-bottom: 20px;
+    }
+
+        .forgot-password a {
+            text-decoration: none;
+            color: #ff416c;
+        }
+
+    .login-btn {
+        width: 100%;
+        background: linear-gradient(90deg, #ff416c, #ff4b2b);
+        border: none;
+        padding: 10px 0;
+        border-radius: 25px;
+        color: #fff;
+        font-size: 18px;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+
+        .login-btn:hover {
+            background: linear-gradient(90deg, #ff4b2b, #ff416c);
+        }
+
+    .social-login {
+        text-align: center;
+        margin: 20px 0;
+    }
+
+        .social-login p {
+            color: #666;
+        }
+
+    .social-icons {
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+    }
+
+        .social-icons a {
+            text-decoration: none;
+            font-size: 20px;
+            color: #333;
+            transition: 0.3s;
+        }
+
+            .social-icons a:hover {
+                color: #ff416c;
+            }
+
+    .sign-up {
+        text-align: center;
+    }
+
+        .sign-up p {
+            color: #666;
+        }
+
+        .sign-up a {
+            text-decoration: none;
+            color: #ff416c;
+        }
+
+</style>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Page</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="login">
+        <div class="login-box">
+            <h2>Login</h2>
+            <form asp-action="Login" method="post">
+                <div asp-validation-summary="All" class="text-danger"></div>
+                <div class="input-box">
+                    <input asp-for="Email" required />
+                    <label asp-for="Email">Email</label>
+                    <span asp-validation-for="Email" class="text-danger"></span>
+                </div>
+                <div class="input-box">
+                    <input asp-for="Password" type="password" required />
+                    <label asp-for="Password">Password</label>
+                    <span asp-validation-for="Password" class="text-danger"></span>
+                </div>
+                @if (!string.IsNullOrEmpty(ViewData["LoginError"]?.ToString()))
+                {
+                    <div class="text-danger" style="margin-top: -20px;">
+                        @ViewData["LoginError"]
+                    </div>
+                }
+                <div class="forgot-password">
+                    <a href="#">Forgot password?</a>
+                </div>
+                <button type="submit" class="login-btn">LOGIN</button>
+                <div class="social-login">
+                    <p>Or Sign Up Using</p>
+                    <div class="social-icons">
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-google"></i></a>
+                    </div>
+                </div>
+                <div class="sign-up">
+                    <p>Have not account yet? <a href="/Account/SignUp">SIGN UP</a></p>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
+    @section Scripts {
+        @{
+            await Html.RenderPartialAsync("_ValidationScriptsPartial");
+        }
+    }
+</body>
+</html>

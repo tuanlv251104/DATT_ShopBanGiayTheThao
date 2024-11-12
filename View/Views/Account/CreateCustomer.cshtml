@@ -1,0 +1,289 @@
+﻿@model Data.ViewModels.CreateAccountModelcs
+
+@{
+    ViewData["Title"] = "CreateCustomer";
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<h1 class="mb-4">Tạo Khách Hàng Mới</h1>
+
+<!-- Container for the employee creation form -->
+<div class="container-fluid">
+    <div class="card shadow-sm rounded">
+        <div class="card-body">
+            <form asp-action="CreateCustomer" enctype="multipart/form-data" method="post">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <div class="row">
+                    <!-- Left side: Customer Information -->
+                    <div class="col-md-4">
+                        @* <!-- Customer Profile Picture -->
+                        <div class="mb-4 text-center">
+                        <label for="profilePicture" class="form-label">Ảnh khách hàng</label>
+                        <div class="profile-img-container mb-3">
+                        <img src="https://via.placeholder.com/150" alt="Avatar" class="rounded-circle" id="profilePreview" width="150">
+                        </div>
+                        <input type="file" class="form-control" id="profilePicture" name="ProfilePicture" onchange="previewImage()">
+                        </div> *@
+
+                        <!-- Customer Information Fields -->
+                        <div class="form-group mb-3">
+                            <label asp-for="Name" class="form-label">Họ và tên <span class="text-danger">*</span></label>
+                            <input asp-for="Name" class="form-control" placeholder="Nhập họ và tên" />
+                            <span asp-validation-for="Name" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label asp-for="Email" class="form-label">Email <span class="text-danger">*</span></label>
+                            <input asp-for="Email" type="email" class="form-control" placeholder="Nhập email" />
+                            <span asp-validation-for="Email" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label asp-for="PhoneNumber" class="form-label">Số điện thoại <span class="text-danger">*</span></label>
+                            <input asp-for="PhoneNumber" class="form-control" placeholder="Nhập số điện thoại" />
+                            <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label asp-for="BirthDay" class="form-label">Ngày sinh <span class="text-danger">*</span></label>
+                            <input asp-for="BirthDay" type="date" class="form-control" />
+                            <span asp-validation-for="BirthDay" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label asp-for="Password" class="form-label">Mật khẩu <span class="text-danger">*</span></label>
+                            <input asp-for="Password" type="password" class="form-control" />
+                            <span asp-validation-for="Password" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label asp-for="ConfirmPassword" class="form-label">Nhập lại mật khẩu <span class="text-danger">*</span></label>
+                            <input asp-for="ConfirmPassword" type="password" class="form-control" />
+                            <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+                        </div>
+
+                        <!-- Update Button -->
+                        <div class="text-center mt-4">
+                            <button type="submit" class="btn btn-success">Thêm mới khách hàng</button>
+                        </div>
+                    </div>
+
+                    <!-- Right side: Address Information -->
+                    <div class="col-md-8">
+                        <h5 class="mb-4">Danh sách địa chỉ</h5>
+
+                        <div id="addressContainer">
+                            <!-- Dynamic Address Fields -->
+                            <div class="address-entry mb-3 border rounded p-3 position-relative">
+                                <div class="row">
+                                    <!-- First row: Name and Phone -->
+                                    <div class="col-md-6">
+                                        <div class="form-group mb-2">
+                                            <label for="AddressName_0" class="form-label">Tên</label>
+                                            <input type="text" name="Addresses[0].Name" class="form-control" id="AddressName_0" placeholder="Nhập tên">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group mb-2">
+                                            <label for="AddressPhone_0" class="form-label">Số điện thoại</label>
+                                            <input type="text" name="Addresses[0].Phone" class="form-control" id="AddressPhone_0" placeholder="Nhập số điện thoại">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Second row: Province, District, Ward -->
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="form-group mb-2">
+                                            <label for="Province_0" class="form-label">Tỉnh/Thành phố</label>
+                                            <input type="text" name="Addresses[0].Province" class="form-control" id="Province_0" placeholder="Nhập tỉnh">
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-4">
+                                        <div class="form-group mb-2">
+                                            <label for="District_0" class="form-label">Quận/Huyện</label>
+                                            <input type="text" name="Addresses[0].District" class="form-control" id="District_0" placeholder="Nhập quận">
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-4">
+                                        <div class="form-group mb-2">
+                                            <label for="Ward_0" class="form-label">Xã/Phường/Thị trấn</label>
+                                            <input type="text" name="Addresses[0].Ward" class="form-control" id="Ward_0" placeholder="Nhập xã">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Third row: Detail Address and Action Icons -->
+                                <div class="form-group mb-2">
+                                    <label for="DetailAddress_0" class="form-label">Địa chỉ chi tiết</label>
+                                    <input type="text" name="Addresses[0].DetailAddress" class="form-control" id="DetailAddress_0" placeholder="Nhập địa chỉ chi tiết">
+                                </div>
+
+                                <!-- Priority and Delete Icons -->
+                                <div class="d-flex justify-content-between">
+                                    <!-- Priority Icon -->
+                                    <button type="button" class="btn btn-warning btn-sm">
+                                        <i class="ti ti-star"></i> Ưu tiên
+                                    </button>
+
+                                    <!-- Delete Icon -->
+                                    <button type="button" class="btn btn-danger btn-sm delete-address">
+                                        <i class="ti ti-trash"></i> Xóa
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Button to Add New Address -->
+                        <button type="button" class="btn btn-outline-success mb-4" id="addAddressButton">
+                            <i class="ti ti-plus"></i> Thêm địa chỉ
+                        </button>
+
+                        <!-- Save Address Button -->
+                        <div class="text-end">
+                            <button type="submit" class="btn btn-primary">Lưu địa chỉ</button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        let addressIndex = 1;
+
+        // Function to add new address fields dynamically
+        document.getElementById('addAddressButton').addEventListener('click', function () {
+            const addressContainer = document.getElementById('addressContainer');
+
+            // Create a new address input field
+            const newAddress = document.createElement('div');
+            newAddress.className = 'address-entry mb-3 border rounded p-3 position-relative';
+            newAddress.innerHTML = `
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group mb-2">
+                                <label for="AddressName_${addressIndex}" class="form-label">Tên</label>
+                                <input type="text" name="Addresses[${addressIndex}].Name" class="form-control" id="AddressName_${addressIndex}" placeholder="Nhập tên">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group mb-2">
+                                <label for="AddressPhone_${addressIndex}" class="form-label">Số điện thoại</label>
+                                <input type="text" name="Addresses[${addressIndex}].Phone" class="form-control" id="AddressPhone_${addressIndex}" placeholder="Nhập số điện thoại">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="form-group mb-2">
+                                <label for="Province_${addressIndex}" class="form-label">Tỉnh</label>
+                                <input type="text" name="Addresses[${addressIndex}].Province" class="form-control" id="Province_${addressIndex}" placeholder="Nhập tỉnh">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group mb-2">
+                                <label for="District_${addressIndex}" class="form-label">Quận</label>
+                                <input type="text" name="Addresses[${addressIndex}].District" class="form-control" id="District_${addressIndex}" placeholder="Nhập quận">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group mb-2">
+                                <label for="Ward_${addressIndex}" class="form-label">Xã</label>
+                                <input type="text" name="Addresses[${addressIndex}].Ward" class="form-control" id="Ward_${addressIndex}" placeholder="Nhập xã">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group mb-2">
+                        <label for="DetailAddress_${addressIndex}" class="form-label">Địa chỉ chi tiết</label>
+                        <input type="text" name="Addresses[${addressIndex}].DetailAddress" class="form-control" id="DetailAddress_${addressIndex}" placeholder="Nhập địa chỉ chi tiết">
+                    </div>
+
+                    <div class="d-flex justify-content-between">
+                        <!-- Star button for priority -->
+                        <button type="button" class="btn btn-outline-warning btn-sm priority-btn">
+                            <i class="ti ti-star"></i> Ưu tiên
+                        </button>
+
+                        <!-- Delete button -->
+                        <button type="button" class="btn btn-danger btn-sm delete-address">
+                            <i class="ti ti-trash"></i> Xóa
+                        </button>
+                    </div>
+                `;
+
+            // Append the new input field to the container
+            addressContainer.appendChild(newAddress);
+
+            // Increment the index for the next address field
+            addressIndex++;
+
+            // Attach delete and priority events to the new buttons
+            attachDeleteEvent(newAddress);
+            attachPriorityEvent(newAddress);
+        });
+
+        // Function to attach the delete event to the delete button
+        function attachDeleteEvent(addressEntry) {
+            const deleteButton = addressEntry.querySelector('.delete-address');
+            deleteButton.addEventListener('click', function () {
+                addressEntry.remove(); // Remove the address entry from the DOM
+            });
+        }
+
+        // Function to attach the priority event to the priority button
+        function attachPriorityEvent(addressEntry) {
+            const priorityButton = addressEntry.querySelector('.priority-btn');
+            priorityButton.addEventListener('click', function () {
+                // Remove the priority from all other entries
+                document.querySelectorAll('.priority-btn').forEach(function (btn) {
+                    btn.classList.remove('btn-warning');
+                    btn.classList.add('btn-outline-warning');
+                    btn.querySelector('i').style.color = ''; // Reset star color
+                });
+
+                // Add priority to the clicked entry
+                priorityButton.classList.remove('btn-outline-warning');
+                priorityButton.classList.add('btn-warning');
+                priorityButton.querySelector('i').style.color = 'gold'; // Color the star gold
+            });
+        }
+
+        // Attach delete and priority events to all existing address entries
+        document.querySelectorAll('.address-entry').forEach(function (addressEntry) {
+            attachDeleteEvent(addressEntry);
+            attachPriorityEvent(addressEntry);
+        });
+
+        // Preview the selected profile image
+        function previewImage() {
+            const input = document.getElementById('profilePicture');
+            const preview = document.getElementById('profilePreview');
+
+            const file = input.files[0];
+            const reader = new FileReader();
+
+            reader.onloadend = function () {
+                preview.src = reader.result;
+            }
+
+            if (file) {
+                reader.readAsDataURL(file);
+            } else {
+                preview.src = 'https://via.placeholder.com/150';
+            }
+        }
+    </script>
+
+
+}

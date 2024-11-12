@@ -1,0 +1,251 @@
+﻿@model IEnumerable<DataProcessing.Models.ProductDetail>
+
+@{
+    ViewData["Title"] = "Product List";
+}
+
+<h2>Product List</h2>
+
+<!-- Filter Form -->
+<form id="filterForm" style="display: flex; flex-wrap: wrap; gap: 10px;">
+    <div>
+        <label for="colorId">Color:</label>
+        <select name="colorId" id="colorId" class="form-select">
+            <option value="">All</option>
+            @foreach (var color in (IEnumerable<SelectListItem>)ViewData["ColorId"])
+            {
+                <option value="@color.Value">@color.Text</option>
+            }
+        </select>
+    </div>
+
+    <div>
+        <label for="sizeId">Size:</label>
+        <select name="sizeId" id="sizeId" class="form-select">
+            <option value="">All</option>
+            @foreach (var size in (IEnumerable<SelectListItem>)ViewData["SizeId"])
+            {
+                <option value="@size.Value">@size.Text</option>
+            }
+        </select>
+    </div>
+
+    <div>
+        <label for="categoryId">Category:</label>
+        <select name="categoryId" id="categoryId" class="form-select">
+            <option value="">All</option>
+            @foreach (var category in (IEnumerable<SelectListItem>)ViewData["CategoryId"])
+            {
+                <option value="@category.Value">@category.Text</option>
+            }
+        </select>
+    </div>
+
+    <div>
+        <label for="brandId">Brand:</label>
+        <select name="brandId" id="brandId" class="form-select">
+            <option value="">All</option>
+            @foreach (var brand in (IEnumerable<SelectListItem>)ViewData["BrandId"])
+            {
+                <option value="@brand.Value">@brand.Text</option>
+            }
+        </select>
+    </div>
+
+    <div>
+        <label for="soleId">Sole:</label>
+        <select name="soleId" id="soleId" class="form-select">
+            <option value="">All</option>
+            @foreach (var sole in (IEnumerable<SelectListItem>)ViewData["SoleId"])
+            {
+                <option value="@sole.Value">@sole.Text</option>
+            }
+        </select>
+    </div>
+
+    <div>
+        <label for="materialId">Material:</label>
+        <select name="materialId" id="materialId" class="form-select">
+            <option value="">All</option>
+            @foreach (var material in (IEnumerable<SelectListItem>)ViewData["MaterialId"])
+            {
+                <option value="@material.Value">@material.Text</option>
+            }
+        </select>
+    </div>
+</form>
+
+<!-- Search Form -->
+<form id="searchForm" style="margin-top: 20px;">
+    <div>
+        <label for="searchQuery">Search:</label>
+        <input type="text" id="searchQuery" name="searchQuery" class="form-select" placeholder="Enter product name" />
+    </div>
+</form>
+
+<!-- Product List -->
+<div id="productList" style="margin-top: 20px;">
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Name</th>
+                <th>Color</th>
+                <th>Size</th>
+                <th>Sole</th>
+                <th>Brand</th>
+                <th>Material</th>
+                <th>Category</th>
+                <th>Price</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model != null && Model.Any())
+            {
+                foreach (var product in Model.ToList())
+                {
+                    <tr>
+                        <td>@product.Id</td>
+                        <td>@product.Product.Name</td>
+                        <td>@product.Color?.Name</td>
+                        <td>@product.Size?.Value</td>
+                        <td>@product.Product.Sole?.TypeName</td>
+                        <td>@product.Product.Brand?.Name</td>
+                        <td>@product.Product.Material?.Name</td>
+                        <td>@product.Product.Category?.Name</td>
+                        <td>@product.Price</td>
+                        <td>
+                            <input type="number" id="quantity_@product.Id" name="quantity" min="1" max="10" value="1" class="form-select" />
+                        </td>
+                        <td>
+                            <form asp-action="AddToCart" method="post">
+                                <input type="hidden" name="productDetailId" value="@product.Id" />                       
+                                <input type="hidden" name="quantity" id="hiddenQuantity_@product.Id" value="1" />
+                                <button type="submit" class="btn btn-primary" onclick="setQuantity('@product.Id')">Add to Cart</button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="8">No products found.</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+<div id="errorContainer" style="display: none; text-align: center;">
+    <img id="errorImage" src="" alt="Error occurred" />
+    <p id="errorMessage">An error occurred while retrieving product details.</p>
+</div>
+
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            // Hàm lọc sản phẩm dựa trên các giá trị được chọn
+            function filterProducts() {
+                var searchQuery = $('#searchQuery').val(); // Lấy giá trị tìm kiếm
+                var colorId = $('#colorId').val();
+                var sizeId = $('#sizeId').val();
+                var categoryId = $('#categoryId').val();
+                var brandId = $('#brandId').val();
+                var soleId = $('#soleId').val();
+                var materialId = $('#materialId').val();
+
+                $.ajax({
+                    url: '@Url.Action("FilterProducts", "ProductDetails")',
+                    type: 'GET',
+                    data: {
+                        searchQuery: searchQuery, // Gửi giá trị tìm kiếm
+                        colorId: colorId,
+                        sizeId: sizeId,
+                        categoryId: categoryId,
+                        brandId: brandId,
+                        soleId: soleId,
+                        materialId: materialId
+                    },
+                    success: function (data) {
+                        updateProductList(data);
+                    },
+                    error: function () {
+                        alert('Error retrieving product details.');
+                    }
+                });
+            }
+            function setQuantity(productId) {
+                var quantity = document.getElementById("quantity_" + productId).value;
+                document.getElementById("hiddenQuantity_" + productId).value = quantity;
+            }
+            // Hàm cập nhật danh sách sản phẩm hiển thị
+            function updateProductList(data) {
+                var productListHtml = '';
+                if (data.length === 0) {
+                    productListHtml += '<tr><td colspan="8">No products found.</td></tr>';
+                } else {
+                    $.each(data, function (index, product) {
+                        productListHtml += '<tr>' +
+                            '<td>' + product.id + '</td>' +
+                            '<td>' + product.product?.name + '</td>' +
+                            '<td>' + product.color?.name + '</td>' +
+                            '<td>' + product.size?.value + '</td>' +
+                            '<td>' + product.product.sole?.typeName + '</td>' +
+                            '<td>' + product.product.brand?.name + '</td>' +
+                            '<td>' + product.product.material?.name + '</td>' +
+                            '<td>' + product.product.category?.name + '</td>' +
+                            '<td>' + product.price + '</td>' +
+                            '</tr>';
+                    });
+                }
+                $('#productList tbody').html(productListHtml);
+            }
+
+            // Gắn sự kiện 'change' cho tất cả các select và 'input' tìm kiếm
+            $('#colorId, #sizeId, #categoryId, #brandId, #soleId, #materialId, #searchQuery').on('change keyup', function () {
+                filterProducts(); // Gọi hàm lọc khi có sự thay đổi
+            });
+        });
+    </script>
+}
+
+<!-- CSS Styles -->
+<style>
+    .filter-form {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        padding: 1rem;
+        background-color: #f9f9f9;
+        border-radius: 5px;
+        margin-bottom: 20px;
+    }
+
+    .form-select {
+        width: 200px;
+        padding: 0.5rem;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+        margin-bottom: 10px;
+    }
+
+        .form-select#searchQuery {
+            width: 100%;   
+}
+    .table {
+        width: 100%;
+        margin-top: 20px;
+        border-collapse: collapse;
+    }
+
+    .table th, .table td {
+        padding: 10px;
+        border: 1px solid #ddd;
+    }
+
+    .table thead {
+        background-color: #343a40;
+        color: #fff;
+    }
+</style>

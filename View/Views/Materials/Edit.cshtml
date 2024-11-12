@@ -1,0 +1,46 @@
+﻿@* @model View.ViewModel.MaterialViewModel
+
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<!-- Modal Chỉnh sửa đế giày -->
+@if (Model.EditMaterial != null) // Kiểm tra nếu có dữ liệu chỉnh sửa
+{
+    <div class="modal fade show" style="display: block;">
+        <!-- Hiển thị modal -->
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Chỉnh sửa đế giày</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form asp-action="Edit" method="post">
+                        <input type="hidden" asp-for="EditMaterial.Id" />
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                        <div class="mb-3">
+                            <label asp-for="EditMaterial.Name" class="form-label">Tên đế giày <span class="text-danger">*</span></label>
+                            <input asp-for="EditMaterial.Name" type="text" class="form-control" placeholder="Nhập tên đế giày" required>
+                            <span asp-validation-for="EditMaterial.Name" class="text-danger"></span>
+                        </div>
+                        <div class="form-group form-check">
+                            <label class="form-check-label">
+                                <input class="form-check-input" asp-for="EditMaterial.Status" /> @Html.DisplayNameFor(model => model.EditMaterial.Status)
+                            </label>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                            <button type="submit" class="btn btn-primary">Lưu</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
+ *@
